@@ -23,7 +23,7 @@ def live_stream(live_feed: LiveStream):
     live_feed_thread.start()
 
     # there could be a slight delay by the time pid_store is populated, so sleep or something else?
-    time.sleep(1)
+    time.sleep(2)
 
     if pid_store.get("ffmpeg_pid"):
         return Response(content=json.dumps({
