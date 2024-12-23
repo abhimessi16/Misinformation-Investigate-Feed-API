@@ -6,7 +6,7 @@ from fastapi import APIRouter, status
 from fastapi.responses import Response
 
 from app.models import LiveStream
-from app.utils import get_audio_from_m3u8_send_to_producer
+from app.utils import get_audio_from_m3u8_send_to_producer, kill_subprocess
 
 live_feed_router = APIRouter(prefix="/v1/api/live-feed")
 
@@ -34,6 +34,19 @@ def live_stream(live_feed: LiveStream):
     return Response(content=json.dumps({
         "message": "Processing of audio failed. Please try again."
     }), status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@live_feed_router.get("/live-stream/stop")
+def live_feed_stop(pid: int):
+    try:
+        kill_subprocess(pid)
+    except Exception as ex:
+        return Response(content=json.dumps({
+        "message": f"Process with pid {pid} does not exist.",
+        "error": str(ex)
+    }), status_code=status.HTTP_404_NOT_FOUND, media_type="application/json")
+    return Response(content=json.dumps({
+        "message": f"Process with pid {pid} is killed.",
+    }), status_code=status.HTTP_200_OK, media_type="application/json")
 
 @live_feed_router.post("/live-audio")
 def live_audio():
