@@ -6,7 +6,7 @@ import app.main as session
 
 def get_audio_from_m3u8_send_to_producer(m3u8_data: LiveStream, pid_store: dict):
     ffmpeg_process = subprocess.Popen(
-        ['ffmpeg', '-loglevel', 'quiet', '-i', m3u8_data.m3u8_link, '-c', 'copy', '-t', '5', '-f', 'wav', 'pipe:1'],
+        ['ffmpeg', '-loglevel', 'quiet', '-i', m3u8_data.m3u8_link, '-c', 'copy', '-t', '5', '-f', 'wav', 'pipe:1'], # duration of 5 for now
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE
     )
@@ -23,13 +23,21 @@ def get_audio_from_m3u8_send_to_producer(m3u8_data: LiveStream, pid_store: dict)
 def send_audio_data_to_kafka(audio_data, m3u8_data: LiveStream):
     if not audio_data:
         return
+    produced_data = {
+        "source": m3u8_data.source,
+        "audio_data": audio_data
+    }
     try:
         session.live_feed_producer.send(
             topic=kafka_topics.get("lv"), 
-            # key=m3u8_data.source, 
-            value=audio_data
+            # key=m3u8_data.source, # gonna implement this later
+            value=produced_data
         )
+        # waiting for the data to be sent is not the best idea,
+        # it kinda beats the purpose of real-time syncing of data
     except Exception as ex:
+        # what can we do if an exception arises
         print(ex)
     finally:
+        # what can we do finally
         print(f"sent data: {len(audio_data)}.")
