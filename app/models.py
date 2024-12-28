@@ -7,3 +7,4 @@ class LiveStream(BaseModel):
     m3u8_link: str
     source: str
     timestamp: datetime
+    session_id: str
