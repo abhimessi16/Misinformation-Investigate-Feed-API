@@ -9,7 +9,6 @@ import app.main as session
 
 def get_audio_from_m3u8_send_to_producer(m3u8_data: LiveStream, pid_store: dict):
     # add a retry mechanism, check how?
-    print(m3u8_data.m3u8_link)
     ffmpeg_process = subprocess.Popen(
         ['ffmpeg', '-loglevel', 'quiet', '-vn', '-i', m3u8_data.m3u8_link, '-t', '180','-acodec', 'pcm_s16le','-ac', '1', '-ar', '16000', '-f', 'wav', 'pipe:1'], # duration of 180 for now
         stdout=subprocess.PIPE,
@@ -43,9 +42,9 @@ def send_audio_data_to_kafka(audio_data: bytes, m3u8_data: LiveStream):
     except Exception as ex:
         # what can we do if an exception arises
         print(ex)
-    # finally:
+    finally:
     #     # what can we do finally
-    #     print(f"sent data: {len(audio_data)}.")
+        print(f"sent data: {len(audio_data)}.")
 
 def kill_subprocess(pid: int):
     os.kill(pid, signal.SIGTERM)

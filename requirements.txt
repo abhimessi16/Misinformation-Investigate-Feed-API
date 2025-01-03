@@ -1,3 +1,4 @@
 fastapi[standard]
 kafka-python-ng
 numpy
+sse-starlette

@@ -8,3 +8,9 @@ class LiveStream(BaseModel):
     source: str
     timestamp: datetime
     session_id: str
+
+class EventInput(BaseModel):
+    source: str
+    session_id: str
+    audio_data: str
+    fact_source: str
